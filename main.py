@@ -26,26 +26,22 @@ def checkDatabase(symbol):
         print(f"{CSV_FILE} not found. Downloading data up to {END_DATE.date()} for {symbol}.")
         return END_DATE - timedelta(days=365 * 10)
 
-    # Read CSV and check for 'date' and 'symbol' columns
     df = pd.read_csv(CSV_FILE)
     if 'date' not in df.columns or 'symbol' not in df.columns:
         print(f"{CSV_FILE} does not contain the required columns. Downloading all data for {symbol}.")
         return END_DATE - timedelta(days=365 * 10)
 
-    # Convert 'date' column to datetime
     df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
 
     if symbol in df['symbol'].values:
         last_date_str = df[df['symbol'] == symbol]['date'].max()
         print(f"Found existing for {symbol}. Last available date: {last_date_str.date()}")
 
-        # If last date is today or later, return None to indicate no new data needs to be fetched
         if last_date_str >= datetime.now().replace(hour=0, minute=0, second=0,
-                                                   microsecond=0):  # Ensure only date comparison
+                                                   microsecond=0):
             print(f"No new data needed for {symbol} since the last date is already today.")
-            return None  # Skip refilling if already up-to-date
+            return None
 
-        # If last date is before END_DATE, use END_DATE; otherwise, start from last date + 1 day
         return last_date_str if last_date_str < END_DATE else END_DATE
     else:
         print(f"No data found for {symbol}. Downloading up to {END_DATE.date()} for {symbol}.")
@@ -71,34 +67,30 @@ def fetch_data(symbol, from_date, to_date):
     for row in table.find_all("tr")[1:]:
         cells = row.find_all("td")
         if len(cells) >= 9:
-            # Handle Last_Transaction formatting
             last_transaction_raw = cells[1].text.strip()
             try:
                 last_transaction = last_transaction_raw.replace(".", "").replace(",", ".")
                 last_transaction = "{:,.2f}".format(float(last_transaction))
             except ValueError:
-                last_transaction = None  # or set to a default value like 0.0
+                last_transaction = None
 
-            # Handle Max formatting
             try:
                 max_value = cells[2].text.strip().replace(".", "").replace(",", ".")
                 max_value = "{:,.2f}".format(float(max_value))
             except ValueError:
-                max_value = None  # or set to a default value like 0.0
+                max_value = None
 
-            # Handle Min formatting
             try:
                 min_value = cells[3].text.strip().replace(".", "").replace(",", ".")
                 min_value = "{:,.2f}".format(float(min_value))
             except ValueError:
-                min_value = None  # or set to a default value like 0.0
+                min_value = None
 
-            # Handle Avg formatting
             try:
                 avg_value = cells[4].text.strip().replace(".", "").replace(",", ".")
                 avg_value = "{:,.2f}".format(float(avg_value))
             except ValueError:
-                avg_value = None  # or set to a default value like 0.0  # or set to 0.0 or any other default value
+                avg_value = None
 
             record = {
                 "symbol": symbol,
@@ -119,7 +111,6 @@ def fetch_data(symbol, from_date, to_date):
 def fillDatabase(symbol, last_date):
     all_data = []
     if last_date is None:
-        # If last_date is None, skip the refill (no data needed)
         return all_data
 
     if last_date < END_DATE:
