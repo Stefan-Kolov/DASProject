@@ -3,7 +3,6 @@ package mk.finki.ukim.mk.daswebapplication.web;
 import mk.finki.ukim.mk.daswebapplication.model.StockData;
 import mk.finki.ukim.mk.daswebapplication.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,4 +49,6 @@ public class MarketTrendsController {
             default -> 30;
         };
     }
+
+
 }

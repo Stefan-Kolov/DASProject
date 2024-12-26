@@ -16,9 +16,12 @@
           crossorigin="anonymous"></script>
   <script src="https://kit.fontawesome.com/e59232f0a1.js" crossorigin="anonymous"></script>
   <style>
-    h1{
+    h1,h2{
       text-align: center;
       margin: 15px;
+    }
+    table{
+      width: 60%;
     }
   </style>
 </head>
@@ -46,12 +49,17 @@
         </ul>
         <ul class="navbar-nav m-auto">
           <li class="nav-item m-auto">
-            <a class="nav-link active" href="/market-trends">Market Trends</a>
+            <a class="nav-link active" href="/trends">Market Trends</a>
           </li>
         </ul>
         <ul class="navbar-nav m-auto">
           <li class="nav-item m-auto">
             <a class="nav-link active" href="/resources">Resources</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav m-auto">
+          <li class="nav-item m-auto">
+            <a class="nav-link active" href="/api/run-python">UPDATE CSV</a>
           </li>
         </ul>
 
@@ -74,6 +82,24 @@
   </nav>
 </header>
 <h1>Market Trends</h1>
+<h2>Top 10 Most Traded Stocks On <span th:text="${lastDate}"></span></h2>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Symbol</th>
+    <th>Total Profit</th>
+  </tr>
+  </thead>
+  <tbody>
+  <th:block th:each="symbol : ${topSymbols}">
+    <tr>
+      <td th:text="${symbol.symbol}">Symbol</td>
+      <td th:text="${symbol.getTotalProfitFormatted()}">Total Profit</td>
+    </tr>
+  </th:block>
+  </tbody>
+</table>
+
 <footer class="text-black-50 mt-xl-5">
   <div class="container">
     <div class="row">

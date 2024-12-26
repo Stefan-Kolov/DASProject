@@ -3,6 +3,7 @@ package mk.finki.ukim.mk.daswebapplication.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 
 @Data
@@ -22,5 +23,10 @@ public class StockData {
 
     public StockData() {
 
+    }
+
+    public String getTotalProfitFormatted() {
+        DecimalFormat df = new DecimalFormat("#,###");
+        return df.format(bestProfit);
     }
 }

@@ -9,8 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +68,27 @@ public class CsvService {
         return marketItems.stream()
                 .map(StockData::getSymbol)
                 .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<StockData> getTop10SymbolsByLatestDateAndProfit() throws IOException {
+        List<StockData> marketItems = readCSV();
+
+        Optional<LocalDate> latestDate = marketItems.stream()
+                .map(StockData::getDate)
+                .max(LocalDate::compareTo);
+
+        if (latestDate.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<StockData> latestData = marketItems.stream()
+                .filter(item -> item.getDate().equals(latestDate.get()))
+                .toList();
+
+        return latestData.stream()
+                .sorted((item1, item2) -> Double.compare(item2.getTotalProfit(), item1.getTotalProfit()))
+                .limit(10)
                 .collect(Collectors.toList());
     }
 }
