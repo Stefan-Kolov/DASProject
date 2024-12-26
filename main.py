@@ -7,7 +7,8 @@ import os
 import time
 
 BASE_URL = "https://www.mse.mk/mk/stats/symbolhistory/"
-CSV_FILE = "stock_data.csv"
+CSV_FILE = ("C:\\Users\\kolov\\PycharmProjects\\DASProject\\Domasna 2\\tech "
+            "prototype\\DASWebApplication\\src\\main\\resources\\static\\stock_data.csv")
 END_DATE = datetime(2024, 11, 1)
 
 
@@ -126,7 +127,7 @@ def fillDatabase(symbol, last_date):
         date_ranges.append((symbol, current_start, current_end))
         current_start += timedelta(days=30)
 
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=30) as executor:
         futures = {executor.submit(fetch_data, symbol, from_date, to_date): (from_date, to_date) for
                    symbol, from_date, to_date in date_ranges}
         for future in futures:
@@ -150,9 +151,15 @@ def main():
     if all_data:
         try:
             existing_df = pd.read_csv(CSV_FILE)
-            df = pd.concat([existing_df, pd.DataFrame(all_data)], ignore_index=True).drop_duplicates()
+            new_data_df = pd.DataFrame(all_data)
+            df = pd.concat([existing_df, new_data_df], ignore_index=True).drop_duplicates()
         except FileNotFoundError:
             df = pd.DataFrame(all_data)
+
+        df["Total Profit"] = pd.to_numeric(df["Total Profit"], errors="coerce")
+        df = df[df["Total Profit"] != 0]
+
+        df.loc[df["Total Profit"].isna(), "Total Profit"] = df["BEST Profit"]
 
         df.to_csv(CSV_FILE, index=False)
         print(f"New data has been saved to {CSV_FILE}")
