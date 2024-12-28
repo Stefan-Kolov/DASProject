@@ -13,9 +13,8 @@ public class PythonScriptController {
     @GetMapping("/run-python")
     public String runPythonScript() {
         try {
-            String pythonScriptPath = "C:\\Users\\kolov\\PycharmProjects\\DASProject\\main.py";
-            String py = "C:\\Users\\kolov\\anaconda3\\python.exe";
-            ProcessBuilder processBuilder = new ProcessBuilder(py, pythonScriptPath);
+            String pythonScriptPath = "src/main/resources/static/dataDownload.py";
+            ProcessBuilder processBuilder = new ProcessBuilder("python", pythonScriptPath);
             Process process = processBuilder.start();
 
             System.out.println("Python script started.");

@@ -2,7 +2,6 @@ package mk.finki.ukim.mk.daswebapplication.web;
 
 import mk.finki.ukim.mk.daswebapplication.model.StockData;
 import mk.finki.ukim.mk.daswebapplication.service.CsvService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,9 +15,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/market")
 public class MarketTrendsController {
+    private final CsvService csvService;
 
-    @Autowired
-    private CsvService csvService;
+    public MarketTrendsController(CsvService csvService) {
+        this.csvService = csvService;
+    }
 
     @GetMapping("/profit")
     public List<StockData> getProfitData(@RequestParam String symbol,

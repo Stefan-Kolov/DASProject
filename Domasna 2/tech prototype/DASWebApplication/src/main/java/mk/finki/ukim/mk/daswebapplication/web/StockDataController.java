@@ -51,6 +51,7 @@ public class StockDataController {
         System.out.println("Filtered stock data size: " + stockData.size());
 
         double rsi = technicalIndicatorsService.calculateRSI(stockData, 14);
+        double sma = technicalIndicatorsService.calculateSMA(stockData,14);
         double macd = technicalIndicatorsService.calculateMACD(stockData);
         double stochastic = technicalIndicatorsService.calculateStochastic(stockData, 14);
         String signal = technicalIndicatorsService.generateSignal(rsi, macd);
@@ -58,6 +59,7 @@ public class StockDataController {
         Map<String, Object> response = new HashMap<>();
         response.put("rsi", rsi);
         response.put("macd", macd);
+        response.put("sma", sma);
         response.put("stochastic", stochastic);
         response.put("signal", signal);
         response.put("stockData", stockData);

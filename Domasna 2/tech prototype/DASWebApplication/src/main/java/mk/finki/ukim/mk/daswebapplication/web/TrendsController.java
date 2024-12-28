@@ -2,7 +2,6 @@ package mk.finki.ukim.mk.daswebapplication.web;
 
 import mk.finki.ukim.mk.daswebapplication.model.StockData;
 import mk.finki.ukim.mk.daswebapplication.service.CsvService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +13,11 @@ import java.util.List;
 @Controller
 @RequestMapping("/trends")
 public class TrendsController {
-    @Autowired
-    private CsvService csvService;
+    private final CsvService csvService;
+
+    public TrendsController(CsvService csvService) {
+        this.csvService = csvService;
+    }
 
     @GetMapping
     public String showMarketTrendsPage(Model model) throws IOException {
