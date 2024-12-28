@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class CsvService {
-    private static final String CSV_FILE_PATH = "C:\\Users\\kolov\\PycharmProjects\\DASProject\\Domasna 2\\tech prototype\\DASWebApplication\\src\\main\\resources\\static\\stock_data.csv";
+    private static final String CSV_FILE_PATH = "C:\\Users\\Hp\\Desktop\\proekt\\DASProject\\Domasna 2\\tech prototype\\DASWebApplication\\src\\main\\resources\\static\\stock_data.csv";
 
     public List<StockData> readCSV() throws IOException {
         List<StockData> marketItems = new ArrayList<>();
