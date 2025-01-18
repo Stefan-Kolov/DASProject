@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/e59232f0a1.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        h1{
+            text-align: center;
+            margin: 15px;
+        }
+        #filterForm{
+            text-align: center;
+            margin: 15px;
+        }
+        #symbol,#range{
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+<header xmlns:sec="http://www.w3.org/1999/xhtml">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/home">Investing in Macedonia: Stock Market Overview</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+                    aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarsExampleDefault">
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/home">Home</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/stock-data">Stock Data</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/trends">Market Trends</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/resources">Resources</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/api/run-python">UPDATE DATA</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+<h1>Market Data Chart</h1>
+<form id="filterForm">
+    <label for="symbol" class="form-label">Select Symbol: </label>
+    <select id="symbol" name="symbol" class="form-select">
+        <th:block th:each="symbol : ${symbols}">
+            <option th:value="${symbol}" th:text="${symbol}"></option>
+        </th:block>
+    </select>
+
+    <label for="range" class="form-label">Select Range: </label>
+    <select id="range" name="range" class="form-select">
+        <option value="1week">1 Week</option>
+        <option value="1month">1 Month</option>
+        <option value="1year">1 Year</option>
+        <option value="5year">5 Year</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Load Data</button>
+</form>
+
+<canvas id="profitChart" width="250" height="125"></canvas>
+
+<script>
+    let chart = null;
+
+    document.getElementById('filterForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const symbol = document.getElementById('symbol').value;
+        const range = document.getElementById('range').value;
+
+        console.log("Fetching data for symbol:", symbol, "and range:", range);
+
+        fetch(`/api/market/profit?symbol=${symbol}&range=${range}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    console.log("No data available for the selected symbol and range.");
+                    return;
+                }
+
+                const labels = data.map(item => {
+                    const date = new Date(item.date);
+                    return date.toISOString().split('T')[0];
+                });
+
+                const totalProfit = data.map(item => item.totalProfit);
+                if (chart) {
+                    chart.destroy();
+                }
+
+                const ctx = document.getElementById('profitChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Profit',
+                            data: totalProfit,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    }
+                });
+
+                console.log("Chart updated with new data.");
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                alert("Error fetching data. Please try again later.");
+            });
+    });
+</script>
+
+
+
+<footer class="text-black-50 mt-xl-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-lg-4 col-xl-3">
+                <h5>About</h5>
+                <hr class="bg-white mb-2 mt-0 d-inline-block mx-auto w-25">
+                <p class="mb-0">
+                    This platform provides a comprehensive overview of the Macedonian stock market, offering insights and data analysis for both experienced investors and newcomers.
+                </p>
+            </div>
+
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto">
+                <h5>Informations</h5>
+                <hr class="bg-white mb-2 mt-0 d-inline-block mx-auto w-25">
+                <ul class="list-unstyled">
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/stock-data">Stock Data</a></li>
+                    <li><a href="/trends">Market Trends</a></li>
+                    <li><a href="/resources">Resources</a></li>
+                </ul>
+            </div>
+
+
+            <div class="col-md-4 col-lg-3 col-xl-3">
+                <h5>Contact</h5>
+                <hr class="bg-white mb-2 mt-0 d-inline-block mx-auto w-25">
+                <ul class="list-unstyled">
+                    <li><i class="fa fa-envelope mr-2"></i> stefan.kolov@students.finki.ukim.mk</li>
+                    <li><i class="fa fa-envelope mr-2"></i> simeon.chaushevski@students.finki.ukim.mk</li>
+                    <li><i class="fa fa-envelope mr-2"></i> andrej.jakimovski.1@students.finki.ukim.mk</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
